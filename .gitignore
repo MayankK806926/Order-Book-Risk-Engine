@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.o
+*.exe
+src/cpp/test_orderbook
+outputs/
+.DS_Store
