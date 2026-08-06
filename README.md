@@ -1,6 +1,51 @@
-# Week 5–6: C++ Systems, Risk Management & Execution
+# Order Book & Risk Engine
 
-## Structure
+A limit order book matching engine and pre-trade risk manager written in
+C++17, plus a companion Python layer for market microstructure analysis,
+position sizing, and execution algorithms. The book implements
+price-time priority matching — the same discipline used by NSE, BSE,
+and NYSE — across LIMIT, MARKET, IOC, and FOK order types.
+
+## Features
+
+- **Price-time priority matching engine** — `std::map<Price, PriceLevel>`
+  for sorted price levels (descending for bids, ascending for asks),
+  `std::deque<Order*>` per level for FIFO time priority
+- **Four order types**: LIMIT, MARKET, IOC (immediate-or-cancel), FOK
+  (fill-or-kill), including multi-level sweeps and partial fills
+- **Pre-trade risk manager**: position limits, order-size limits,
+  order-rate limiting, and a mark-to-market daily-loss kill switch
+- **57 C++ unit tests** covering the order book and risk manager
+- **Python layer**: order book simulator with a live depth chart,
+  microstructure metrics (Amihud illiquidity, Roll spread, price
+  impact), position sizing (Kelly, vol-targeting, VaR-based limits),
+  and execution algorithms (VWAP, TWAP, implementation shortfall) —
+  **20 Python unit tests**
+
+## Architecture
+
+| Component | Responsibility |
+|---|---|
+| `OrderBook` | Matching engine — accepts orders, matches against the opposite side, rests unfilled limit quantity |
+| `RiskManager` | Pre-trade checks on every order before it reaches the book; tracks net position and mark-to-market P&L |
+| `PriceLevel` | One price, FIFO queue of orders, cached total quantity |
+
+Time complexity: `O(log P)` to add an order (`P` = distinct price
+levels), `O(1)` amortised to rest it, `O(F)` to match (`F` = fills
+generated).
+
+## Risk Metrics (Python layer)
+
+| Metric | Formula |
+|--------|---------|
+| Parametric VaR | μ − z_α × σ |
+| Historical VaR | percentile(-returns, α) |
+| CVaR | E[loss \| loss > VaR] |
+| Sharpe | (μ − r_f) / σ × √252 |
+| Kelly fraction | μ / σ² |
+
+## Project Structure
+
 ```
 cpp-systems-risk/
 └── src/
@@ -21,6 +66,7 @@ cpp-systems-risk/
 ```
 
 ## Quickstart
+
 ```bash
 cd cpp-systems-risk/src/cpp && make test       # 57/57 C++ tests
 # no `make` available? build directly:
@@ -30,77 +76,31 @@ python tests/test_week56.py  # 20/20 Python tests
 python run_analysis.py       # full analysis
 ```
 
-## Bugs Found & Fixed
+## Engineering Notes
 
-A deep-dive review found and fixed five real bugs across the C++ engine
-and the Python execution algos.
+Five defects found in review, each covered by a regression test:
 
-1. **The demo crashed with heap corruption.** `demo_market_simulation()`
-   in `test_order_book.cpp` stored orders in a `std::vector<Order>` while
-   interleaving `emplace_back()` with `ob.add_order()` — but `OrderBook`
-   keeps raw `Order*` pointers into whatever container holds the orders
-   (documented in `PriceLevel`). A `std::vector` reallocates its buffer
-   as it grows, invalidating every pointer the book had already stored
-   from earlier loop iterations. Confirmed via `gdb` backtrace: the
-   segfault surfaced later, inside `~OrderBook()`, destroying an already
-   heap-corrupted `deque`. Fixed by switching to `std::deque<Order>`,
-   which never invalidates references to existing elements on
-   `push_back`/`emplace_back`.
-2. **Cancelling the last order at a price level left a phantom quote.**
-   `cancel_order()` zeroed a `PriceLevel`'s quantity but never erased
-   the now-empty entry from the `bids_`/`asks_` map. `best_bid()` /
-   `best_ask()` only check whether the map entry exists, not whether
-   it's actually empty — so they kept reporting a price with zero real
-   liquidity after the only order there was cancelled. `print()`
-   happened to mask this (it filters on `total_quantity > 0`), which is
-   why it went unnoticed. Fixed by erasing the level when it empties.
-3. **The risk manager's kill switch could trip on a normal buy.**
-   `daily_pnl_` was raw realised cash flow — debited the instant you
-   bought anything, credited only on a sell. A single buy of 1,000
-   shares at ₹2,500 (well within the default 1,000-share order-size
-   limit) produced a "loss" of ₹2.5M against a ₹50,000 kill-switch
-   threshold — halting all trading on ordinary inventory acquisition,
-   not an actual loss. Fixed by making `daily_pnl()` mark-to-market:
-   realised cash flow + net position valued at the last traded price.
-4. **Dead code.** `prune_empty_bids()`/`prune_empty_asks()` were
-   declared in the header and never implemented or called (the cancel
-   fix above makes an explicit pruning pass unnecessary — pruning now
-   happens right where the level empties). A no-op line in
-   `match_order()` (`total_quantity -= min(total_quantity,
-   total_quantity)`, i.e. always zero, then immediately overwritten by
-   a correct recomputation three lines later) was also removed.
-5. **TWAP could execute far more than requested.** `twap_execution()`
-   used `max(1, int(exe * noise))` on every interval, forcing a phantom
-   1-share fill into intervals that were legitimately allocated 0 shares
-   (whenever `total_shares < n_intervals`). A 5-share order sliced into
-   10 intervals could execute up to ~14 shares. Fixed by only applying
-   the randomise-and-floor-at-1 logic to intervals that actually got a
-   nonzero allocation.
-
-All five are covered by regression tests (`test_order_book.cpp`:
-+2 tests, now 57; `tests/test_week56.py`: +1 test, now 20).
-
-## Key Concepts
-
-### Order Book (C++)
-- Price-time priority matching
-- `std::map<Price, PriceLevel, greater>` for bids (descending)
-- `std::map<Price, PriceLevel>` for asks (ascending)
-- `std::deque<Order*>` for FIFO time priority
-- Handles: LIMIT, MARKET, IOC, FOK orders
-
-### Risk Engine
-| Metric | Formula |
-|--------|---------|
-| Parametric VaR | μ − z_α × σ |
-| Historical VaR | percentile(-returns, α) |
-| CVaR | E[loss \| loss > VaR] |
-| Sharpe | (μ − r_f) / σ × √252 |
-| Kelly fraction | μ / σ² |
-
-### Interview Answers
-**"Why std::map for the order book?"** — Need sorted price levels for matching. O(log n) insert/lookup is acceptable for a project engine. Production uses flat pre-allocated arrays.
-
-**"What's wrong with VaR?"** — Not subadditive, ignores severity beyond threshold, understates fat-tail risk. CVaR fixes all three.
-
-**"Why fractional Kelly?"** — Edge (μ) is estimated, not known. Overestimating edge → overbetting → ruin. Half-Kelly has ¾ the growth with half the variance.
+- **Heap corruption in the demo.** A market-sim demo stored orders in a
+  `std::vector` while interleaving inserts with `add_order()` calls —
+  but the book keeps raw pointers into that storage, and vector
+  reallocation on growth invalidates them. Confirmed via `gdb`
+  backtrace (the segfault surfaced later, inside the destructor).
+  Fixed by switching to `std::deque`, which never invalidates
+  references to existing elements on insert.
+- **Phantom quotes after cancellation.** Cancelling the last order at a
+  price level zeroed its quantity but never erased the map entry, so
+  `best_bid()`/`best_ask()` kept reporting a price with no real
+  liquidity behind it. Fixed by erasing the level once it empties.
+- **Kill switch could trip on a normal buy.** The risk manager tracked
+  raw realised cash flow as "P&L" — a single buy looked like a large
+  loss the instant it executed, capable of halting trading on ordinary
+  inventory acquisition. Fixed with proper mark-to-market accounting
+  (cash flow + position valued at last traded price).
+- **TWAP could over-execute.** A rounding/randomisation step forced a
+  phantom minimum fill into intervals that were legitimately allocated
+  zero shares, so a small order sliced across many intervals could
+  execute well above the requested size. Fixed to only apply the
+  randomise-and-floor step to intervals with a real allocation.
+- Removed a block of dead code (`match_order()` computed and
+  immediately discarded a quantity, and two pruning functions were
+  declared but never implemented or called).
