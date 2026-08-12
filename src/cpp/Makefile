@@ -1,4 +1,4 @@
-# Makefile — Order book matching engine
+# Makefile - Order book matching engine
 #
 # Usage:
 #   make          → build everything

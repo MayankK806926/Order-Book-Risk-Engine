@@ -1,5 +1,5 @@
 /*
- * risk_manager.cpp — Pre-trade risk check implementation.
+ * risk_manager.cpp - Pre-trade risk check implementation.
  */
 
 #include "risk_manager.h"
@@ -30,7 +30,7 @@ RiskCheckResult RiskManager::check(const Order& order) {
     // Hard stop: if already breached, reject everything
     if (breached_) return RiskCheckResult::REJECTED_DAILY_LOSS;
 
-    // 1. Daily loss check (mark-to-market, not raw cash flow — see
+    // 1. Daily loss check (mark-to-market, not raw cash flow - see
     // daily_pnl() in risk_manager.h for why that distinction matters)
     if (daily_pnl() <= limits_.max_daily_loss) {
         breached_ = true;
@@ -96,7 +96,7 @@ void RiskManager::on_fill(const Trade& trade, Side aggressor_side) {
 }
 
 void RiskManager::on_cancel(const Order& order) {
-    // Nothing to reverse for resting orders — position not yet taken
+    // Nothing to reverse for resting orders - position not yet taken
     (void)order;
 }
 

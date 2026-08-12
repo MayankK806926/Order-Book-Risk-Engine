@@ -1,5 +1,5 @@
 """
-python/execution_algos.py — VWAP, TWAP, implementation shortfall, TCA.
+python/execution_algos.py - VWAP, TWAP, implementation shortfall, TCA.
 
 WHY EXECUTION ALGORITHMS:
 A large order cannot be submitted all at once. Buying 100,000 shares of
@@ -19,12 +19,12 @@ OPTIMAL EXECUTION (Almgren-Chriss 2001):
 Minimise: E[Cost] + λ × Var[Cost]
 where λ controls the risk aversion.
 
-λ=0: linear schedule (trade at constant rate) — minimises risk
-λ=∞: trade immediately — minimises timing risk but maximises impact
+λ=0: linear schedule (trade at constant rate) - minimises risk
+λ=∞: trade immediately - minimises timing risk but maximises impact
 
 VWAP vs TWAP:
-VWAP: Volume Weighted Average Price — benchmark price weighted by volume
-TWAP: Time Weighted Average Price    — simple average over the day
+VWAP: Volume Weighted Average Price - benchmark price weighted by volume
+TWAP: Time Weighted Average Price    - simple average over the day
 
 A VWAP algo slices orders proportional to intraday volume profile.
 Executes more at open/close (high volume) and less at midday (low volume).
@@ -166,7 +166,7 @@ def twap_execution(total_shares: int, n_intervals: int,
     TWAP execution algorithm.
 
     Splits total shares equally across n_intervals time intervals.
-    Simpler than VWAP — does not require volume profile estimation.
+    Simpler than VWAP - does not require volume profile estimation.
 
     WHEN TO USE TWAP OVER VWAP:
     - Illiquid stocks: volume profile unreliable → TWAP more predictable
@@ -195,7 +195,7 @@ def twap_execution(total_shares: int, n_intervals: int,
 
         # Only randomise (and floor at 1) intervals that were actually
         # allocated shares. When total_shares < n_intervals, shares_per
-        # rounds down to 0 for most intervals — max(1, ...) used to force
+        # rounds down to 0 for most intervals - max(1, ...) used to force
         # a phantom 1-share fill into EVERY such interval regardless,
         # so a 5-share order over 10 intervals could execute ~14 shares.
         if randomise and exe > 0:

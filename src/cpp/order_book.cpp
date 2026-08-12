@@ -1,5 +1,5 @@
 /*
- * order_book.cpp — Limit order book matching engine implementation.
+ * order_book.cpp - Limit order book matching engine implementation.
  *
  * The matching engine is the heart of any exchange or HFT system.
  * This implementation uses price-time priority (FIFO at each price level)
@@ -19,7 +19,7 @@ namespace orderbook {
 OrderBook::OrderBook(std::string symbol)
     : symbol_(std::move(symbol)) {}
 
-// ── add_order — main entry point ──────────────────────────────────────────────
+// ── add_order - main entry point ──────────────────────────────────────────────
 
 std::vector<Trade> OrderBook::add_order(Order& order) {
     order.timestamp = ++seq_num_;
@@ -68,7 +68,7 @@ std::vector<Trade> OrderBook::add_order(Order& order) {
     return new_trades;
 }
 
-// ── match_order — core matching logic ─────────────────────────────────────────
+// ── match_order - core matching logic ─────────────────────────────────────────
 
 std::vector<Trade> OrderBook::match_order(Order& aggressive) {
     /*
@@ -80,13 +80,13 @@ std::vector<Trade> OrderBook::match_order(Order& aggressive) {
      * This rewards the passive (resting) order with price improvement.
      *
      * WHY PASSIVE PRICE:
-     * The aggressive order is "crossing the spread" — they accept the
+     * The aggressive order is "crossing the spread" - they accept the
      * resting order's price. This is standard exchange convention.
      */
     std::vector<Trade> trades;
 
     if (aggressive.side == Side::BUY) {
-        // Match BUY against asks (ascending price — best ask first)
+        // Match BUY against asks (ascending price - best ask first)
         auto it = asks_.begin();
         while (it != asks_.end() && aggressive.remaining() > 0) {
             Price level_price = it->first;
@@ -134,7 +134,7 @@ std::vector<Trade> OrderBook::match_order(Order& aggressive) {
         }
 
     } else {
-        // Match SELL against bids (descending price — best bid first)
+        // Match SELL against bids (descending price - best bid first)
         auto it = bids_.begin();
         while (it != bids_.end() && aggressive.remaining() > 0) {
             Price level_price = it->first;
@@ -183,7 +183,7 @@ std::vector<Trade> OrderBook::match_order(Order& aggressive) {
     return trades;
 }
 
-// ── execute_fill — update order states ───────────────────────────────────────
+// ── execute_fill - update order states ───────────────────────────────────────
 
 void OrderBook::execute_fill(Order& buy, Order& sell,
                                Price fill_price, Quantity fill_qty) {
@@ -204,7 +204,7 @@ void OrderBook::execute_fill(Order& buy, Order& sell,
     update_status(sell);
 }
 
-// ── rest_order — add unfilled LIMIT order to book ────────────────────────────
+// ── rest_order - add unfilled LIMIT order to book ────────────────────────────
 
 void OrderBook::rest_order(Order& passive) {
     if (passive.side == Side::BUY) {
@@ -230,7 +230,7 @@ bool OrderBook::cancel_order(OrderId id) {
     // Search bids.
     //
     // Cancelling the last live order at a price level must erase that
-    // level from the map — leaving a zero-quantity PriceLevel behind
+    // level from the map - leaving a zero-quantity PriceLevel behind
     // makes best_bid()/best_ask() report a phantom price with no real
     // liquidity (they only check whether the map entry exists, not
     // whether it's actually empty).
@@ -312,7 +312,7 @@ Quantity OrderBook::total_ask_quantity() const {
     return total;
 }
 
-// ── print — human-readable snapshot ──────────────────────────────────────────
+// ── print - human-readable snapshot ──────────────────────────────────────────
 
 void OrderBook::print(int levels) const {
     std::cout << "\n=== Order Book: " << symbol_ << " ===\n";

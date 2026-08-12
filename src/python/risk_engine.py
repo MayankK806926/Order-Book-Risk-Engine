@@ -1,8 +1,8 @@
 """
-python/risk_engine.py — Portfolio risk engine.
+python/risk_engine.py - Portfolio risk engine.
 
 RISK METRICS IMPLEMENTED:
-1. VaR (Value at Risk) — three methods
+1. VaR (Value at Risk) - three methods
 2. CVaR (Conditional VaR / Expected Shortfall)
 3. Sharpe and Sortino ratios
 4. Maximum drawdown and drawdown statistics
@@ -30,7 +30,7 @@ Preferred by Basel III. VaR does NOT satisfy subadditivity.
 INTERVIEW QUESTION:
 "What's wrong with VaR?"
 A: "Three problems:
-1. Not subadditive — adding positions can increase VaR (penalises diversification)
+1. Not subadditive - adding positions can increase VaR (penalises diversification)
 2. Tells you nothing about the severity of losses beyond the threshold
 3. Underestimates tail risk for fat-tailed distributions
 CVaR/Expected Shortfall fixes all three."
@@ -71,7 +71,7 @@ class RiskEngine:
         """
         returns:         pd.Series of portfolio returns (log or simple)
         initial_capital: portfolio size in ₹ for absolute risk metrics
-        freq:            'daily', 'weekly', or 'monthly' — for annualisation
+        freq:            'daily', 'weekly', or 'monthly' - for annualisation
         """
         self.returns  = returns.dropna()
         self.capital  = initial_capital
@@ -98,7 +98,7 @@ class RiskEngine:
 
     def var_historical(self, confidence: float = 0.95) -> float:
         """
-        Historical simulation VaR — empirical percentile of losses.
+        Historical simulation VaR - empirical percentile of losses.
 
         Loss distribution = -returns (positive = bad)
         VaR = percentile of losses at (1-confidence)% level
@@ -110,7 +110,7 @@ class RiskEngine:
     def var_monte_carlo(self, confidence: float = 0.95,
                          n_sim: int = 10_000) -> float:
         """
-        Monte Carlo VaR — simulate from fitted normal distribution.
+        Monte Carlo VaR - simulate from fitted normal distribution.
         For production: use fat-tailed distribution (Student-t, historical bootstrap).
         """
         np.random.seed(42)
@@ -163,7 +163,7 @@ class RiskEngine:
         """
         Sortino ratio = excess return / downside deviation.
 
-        Uses only negative returns for the denominator — penalises
+        Uses only negative returns for the denominator - penalises
         downside volatility only, not upside.
         """
         rf_daily    = (1 + risk_free_rate) ** (1 / self._ann) - 1

@@ -1,20 +1,20 @@
 /*
- * order_book.h — Limit order book matching engine.
+ * order_book.h - Limit order book matching engine.
  *
  * ARCHITECTURE:
  *   OrderBook
  *   ├── bids_  : std::map<Price, PriceLevel, std::greater<Price>>
- *   │             Descending — best bid at top (highest price)
+ *   │             Descending - best bid at top (highest price)
  *   └── asks_  : std::map<Price, PriceLevel>
- *                Ascending  — best ask at top (lowest price)
+ *                Ascending  - best ask at top (lowest price)
  *
  * DESIGN DECISIONS (explain these in interviews):
  *
  * 1. WHY std::map (not unordered_map):
- *    We need price levels in sorted order — best bid/ask, iteration
+ *    We need price levels in sorted order - best bid/ask, iteration
  *    across price levels for partial fills. std::map gives O(log n)
  *    insert/lookup with guaranteed ordering. unordered_map is O(1)
- *    average but has no ordering — wrong for an order book.
+ *    average but has no ordering - wrong for an order book.
  *    In production HFT: custom sorted arrays or skip lists, but
  *    std::map is correct and readable for an interview project.
  *
@@ -230,10 +230,10 @@ private:
     uint64_t    seq_num_ = 0;
 
     /*
-     * bids_: descending map — best bid (highest price) comes first
+     * bids_: descending map - best bid (highest price) comes first
      *   std::greater<Price> makes map::begin() → best bid
      *
-     * asks_: ascending map — best ask (lowest price) comes first
+     * asks_: ascending map - best ask (lowest price) comes first
      *   default less<Price> makes map::begin() → best ask
      */
     std::map<Price, PriceLevel, std::greater<Price>> bids_;

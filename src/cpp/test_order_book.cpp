@@ -1,5 +1,5 @@
 /*
- * test_order_book.cpp — Tests and demo for the order book matching engine.
+ * test_order_book.cpp - Tests and demo for the order book matching engine.
  *
  * Compile:
  *   g++ -std=c++17 -O2 -Wall -Wextra order_book.cpp test_order_book.cpp -o test_ob
@@ -46,7 +46,7 @@ void test_basic_resting() {
     std::cout << "\n--- test_basic_resting ---\n";
     OrderBook ob("TEST");
 
-    // Add a resting limit bid — should NOT match (no asks yet)
+    // Add a resting limit bid - should NOT match (no asks yet)
     auto bid = make_order(Side::BUY, OrderType::LIMIT, 100, 10);
     auto trades = ob.add_order(bid);
 
@@ -106,7 +106,7 @@ void test_price_improvement() {
     auto ask = make_order(Side::SELL, OrderType::LIMIT, 99, 10);
     ob.add_order(ask);
 
-    // Buyer willing to pay 100 — should match at 99 (seller's price)
+    // Buyer willing to pay 100 - should match at 99 (seller's price)
     auto bid = make_order(Side::BUY, OrderType::LIMIT, 100, 10);
     auto trades = ob.add_order(bid);
 
@@ -119,7 +119,7 @@ void test_no_cross() {
     std::cout << "\n--- test_no_cross ---\n";
     OrderBook ob("TEST");
 
-    // Bid at 99, ask at 101 — spread = 2, no match
+    // Bid at 99, ask at 101 - spread = 2, no match
     auto bid = make_order(Side::BUY,  OrderType::LIMIT, 99,  10);
     auto ask = make_order(Side::SELL, OrderType::LIMIT, 101, 10);
     ob.add_order(bid);
@@ -135,13 +135,13 @@ void test_fifo_time_priority() {
     std::cout << "\n--- test_fifo_time_priority ---\n";
     OrderBook ob("TEST");
 
-    // Two resting bids at same price — first one should fill first
+    // Two resting bids at same price - first one should fill first
     auto bid1 = make_order(Side::BUY, OrderType::LIMIT, 100, 10);
     auto bid2 = make_order(Side::BUY, OrderType::LIMIT, 100, 10);
     ob.add_order(bid1);
     ob.add_order(bid2);
 
-    // Sell 10 — should fill bid1 entirely, not bid2
+    // Sell 10 - should fill bid1 entirely, not bid2
     auto ask = make_order(Side::SELL, OrderType::LIMIT, 100, 10);
     ob.add_order(ask);
 
@@ -176,7 +176,7 @@ void test_market_order() {
     ob.add_order(ask1);
     ob.add_order(ask2);
 
-    // Market buy for 15 — sweeps level 100 (10) then partial at 101 (5)
+    // Market buy for 15 - sweeps level 100 (10) then partial at 101 (5)
     auto mkt = make_order(Side::BUY, OrderType::MARKET, 0, 15);
     auto trades = ob.add_order(mkt);
 
@@ -196,7 +196,7 @@ void test_ioc_order() {
     auto ask = make_order(Side::SELL, OrderType::LIMIT, 100, 5);
     ob.add_order(ask);
 
-    // IOC buy for 10 at 100 — fill 5, cancel remaining 5
+    // IOC buy for 10 at 100 - fill 5, cancel remaining 5
     auto ioc = make_order(Side::BUY, OrderType::IOC, 100, 10);
     auto trades = ob.add_order(ioc);
 
@@ -213,7 +213,7 @@ void test_fok_success() {
     auto ask = make_order(Side::SELL, OrderType::LIMIT, 100, 20);
     ob.add_order(ask);
 
-    // FOK buy for 10 — enough liquidity, should fill
+    // FOK buy for 10 - enough liquidity, should fill
     auto fok = make_order(Side::BUY, OrderType::FOK, 100, 10);
     auto trades = ob.add_order(fok);
 
@@ -225,7 +225,7 @@ void test_fok_failure() {
     std::cout << "\n--- test_fok_failure ---\n";
     OrderBook ob("TEST");
 
-    // Only 5 available — FOK for 10 should be rejected entirely
+    // Only 5 available - FOK for 10 should be rejected entirely
     auto ask = make_order(Side::SELL, OrderType::LIMIT, 100, 5);
     ob.add_order(ask);
 
@@ -250,7 +250,7 @@ void test_multi_level_sweep() {
         ob.add_order(ask);
     }
 
-    // Buy 35 — sweeps 101(10), 102(10), 103(10), partial 104(5)
+    // Buy 35 - sweeps 101(10), 102(10), 103(10), partial 104(5)
     auto bid = make_order(Side::BUY, OrderType::LIMIT, 104, 35);
     auto trades = ob.add_order(bid);
 
@@ -310,7 +310,7 @@ void demo_market_simulation() {
     // into whatever container holds these orders (see PriceLevel::orders
     // in order_book.h). A vector reallocates its buffer as it grows,
     // which invalidates every pointer the book already stored from
-    // earlier iterations of the loop below — the book ends up holding
+    // earlier iterations of the loop below - the book ends up holding
     // dangling pointers into freed memory. std::deque never invalidates
     // references to existing elements on push_back/emplace_back, so
     // pointers taken mid-loop stay valid. (This previously crashed with

@@ -1,5 +1,5 @@
 """
-run_analysis.py — Week 5-6 master runner.
+run_analysis.py - Week 5-6 master runner.
 Runs all analyses: order book sim, microstructure, risk engine,
 position sizing comparison, and execution algo TCA.
 

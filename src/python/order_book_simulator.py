@@ -1,8 +1,8 @@
 """
-python/order_book_simulator.py — Python order book simulator and visualiser.
+python/order_book_simulator.py - Python order book simulator and visualiser.
 
 Simulates realistic order flow and renders a live-updating depth chart.
-Companion to the C++ matching engine — same concepts, Python speed for analysis.
+Companion to the C++ matching engine - same concepts, Python speed for analysis.
 
 WHAT THIS DOES:
 1. Simulates a market with random limit and market orders arriving
@@ -69,7 +69,7 @@ class Trade:
 class OrderBook:
     """
     Pure Python order book with price-time priority matching.
-    Simpler than the C++ version — for analysis and visualisation.
+    Simpler than the C++ version - for analysis and visualisation.
     """
 
     def __init__(self, tick_size: float = 0.05):
@@ -431,7 +431,7 @@ def plot_simulation_results(sim: MarketSimulator, save_path: str = None):
     ax.set_ylabel('Price', color=TEXT)
     ax.legend(facecolor=PANEL, edgecolor=GRID, labelcolor=TEXT, fontsize=9)
 
-    plt.suptitle('Order Book Simulation — Market Microstructure Analysis',
+    plt.suptitle('Order Book Simulation - Market Microstructure Analysis',
                  color=TEXT, fontsize=13, fontweight='bold')
 
     if save_path:

@@ -1,5 +1,5 @@
 """
-python/microstructure.py — Market microstructure analysis for NSE equities.
+python/microstructure.py - Market microstructure analysis for NSE equities.
 
 WHAT IS MARKET MICROSTRUCTURE:
 The study of how trades are executed, how prices are set, and how
@@ -233,7 +233,7 @@ def order_imbalance_from_volume(volume: pd.Series, prices: pd.Series,
 
     Better (if available): use signed volume from NSE tick data.
 
-    THIS IS A PROXY — real OBI requires L2 order book data.
+    THIS IS A PROXY - real OBI requires L2 order book data.
     """
     ret      = np.log(prices / prices.shift(1))
     sign     = np.sign(ret)
@@ -328,7 +328,7 @@ def plot_microstructure(prices: pd.Series, volume: pd.Series = None,
     ax1 = fig.add_subplot(gs[0, 0])
     ax1.set_facecolor(PANEL)
     ax1.plot(prices.index, prices.values, color=BLUE, linewidth=1.2)
-    ax1.set_title(f'Price — {symbol}', color=TEXT, fontsize=10)
+    ax1.set_title(f'Price - {symbol}', color=TEXT, fontsize=10)
     ax1.set_ylabel('Price (₹)', color=TEXT)
 
     if volume is not None:
@@ -380,7 +380,7 @@ def plot_microstructure(prices: pd.Series, volume: pd.Series = None,
             spine.set_color(GRID)
         ax.grid(True, color=GRID, linewidth=0.5, alpha=0.4)
 
-    plt.suptitle(f'Market Microstructure Analysis — {symbol}',
+    plt.suptitle(f'Market Microstructure Analysis - {symbol}',
                  color=TEXT, fontsize=13, fontweight='bold')
 
     if save_path:

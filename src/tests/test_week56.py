@@ -1,5 +1,5 @@
 """
-tests/test_week56.py — Test suite for week 5-6 Python modules.
+tests/test_week56.py - Test suite for week 5-6 Python modules.
 
 Run: python tests/test_week56.py
 """
@@ -185,7 +185,7 @@ def test_twap_small_order_many_intervals_no_overexecution():
     5-share order over 10 intervals used to execute as much as 14 shares
     (1 phantom share x 9 empty intervals + ~5 on the one real interval).
     Randomisation still applies to the one interval that has real shares,
-    so the total isn't pinned to exactly 5 — but it must stay near 5,
+    so the total isn't pinned to exactly 5 - but it must stay near 5,
     not balloon toward one-phantom-share-per-empty-interval.
     """
     np.random.seed(3)

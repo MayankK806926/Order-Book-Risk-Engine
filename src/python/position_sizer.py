@@ -1,5 +1,5 @@
 """
-python/position_sizer.py — Position sizing: Kelly, vol-targeting, VaR limits.
+python/position_sizer.py - Position sizing: Kelly, vol-targeting, VaR limits.
 
 THREE FRAMEWORKS FOR POSITION SIZING:
 
@@ -38,7 +38,7 @@ THREE FRAMEWORKS FOR POSITION SIZING:
             = risk_budget / (z_α × σ_stock)
 
    z_α = 1.645 for 95% confidence.
-   Conservative — ensures daily losses stay within a risk budget.
+   Conservative - ensures daily losses stay within a risk budget.
    Used by banks to comply with Basel III.
 """
 
@@ -91,7 +91,7 @@ def kelly_continuous(returns: pd.Series,
 
     Derived from Merton's portfolio problem: maximise E[log(wealth)].
 
-    This is the rolling Kelly fraction — recomputed every period
+    This is the rolling Kelly fraction - recomputed every period
     using the most recent `lookback` days of returns.
 
     In practice, cap at 1.0 (never bet more than 100% of capital).
@@ -321,7 +321,7 @@ class PositionSizerComparison:
             ax2.plot(dd.index, dd.values, color=col, linewidth=1,
                      alpha=0.85, label=m['name'])
 
-        ax1.set_title('Equity curves — position sizing comparison', color=TEXT, fontsize=10)
+        ax1.set_title('Equity curves - position sizing comparison', color=TEXT, fontsize=10)
         ax1.set_ylabel('Portfolio value (₹)', color=TEXT)
         ax1.legend(facecolor=PANEL, edgecolor=GRID, labelcolor=TEXT, fontsize=8)
 

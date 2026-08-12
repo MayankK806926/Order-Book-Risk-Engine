@@ -1,5 +1,5 @@
 /*
- * risk_manager.h — Pre-trade risk checks for the order book engine.
+ * risk_manager.h - Pre-trade risk checks for the order book engine.
  *
  * In a production trading system, EVERY order must pass risk checks
  * before being submitted to the matching engine. This is non-negotiable.
@@ -19,7 +19,7 @@
  * INTERVIEW QUESTION:
  * "What happens if the risk manager goes down?"
  * A: "All order submission must be halted. A risk manager failure
- *    is treated the same as a breach — safe state is no trading."
+ *    is treated the same as a breach - safe state is no trading."
  */
 
 #pragma once
@@ -54,13 +54,13 @@ class RiskManager {
 public:
     explicit RiskManager(RiskLimits limits = RiskLimits{});
 
-    // Check order before submission — returns APPROVED or rejection reason
+    // Check order before submission - returns APPROVED or rejection reason
     RiskCheckResult check(const Order& order);
 
     // Called after each fill to update position and P&L
     void on_fill(const Trade& trade, Side aggressor_side);
 
-    // Called when order is cancelled — reverse any reserved position
+    // Called when order is cancelled - reverse any reserved position
     void on_cancel(const Order& order);
 
     // State queries
@@ -73,7 +73,7 @@ public:
     // WHY NOT JUST THE RAW CASH FLOW:
     // A version that returned the raw cash flow directly would report
     // an ever-growing "loss" the moment you buy anything and never sell
-    // it back the same day — you've only spent cash to acquire inventory
+    // it back the same day - you've only spent cash to acquire inventory
     // of equal value, not lost money. That would trip the daily-loss
     // kill switch on ordinary buying activity, not on actual losses.
     double   daily_pnl() const {
